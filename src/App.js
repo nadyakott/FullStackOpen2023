@@ -47,7 +47,7 @@ const App = () => {
         {
           name: 'Webpack',
           exercises: 7,
-          id: 2
+          id: 3
         }
       ]
     }

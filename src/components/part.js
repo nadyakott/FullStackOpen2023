@@ -1,4 +1,4 @@
-export default function Part({id, name, exercise}) {
+export default function Part({name, exercise}) {
     return(
-        <tr>{name} {exercise}</tr>)
+        <p>{name} {exercise}</p>)
 }

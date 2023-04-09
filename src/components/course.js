@@ -5,9 +5,9 @@ export default function Course({title, parts}) {
 
     return <div>
         <Header text={title}/>
-        <table>
-            {parts.map(part => <Part name={part.name} exercise={part.exercises} id={part.id}/>)}
-        </table>
+        <div>
+            {parts.map(part => <Part name={part.name} exercise={part.exercises} key={part.id}/>)}
+        </div>
         <h3>total of {parts.map(part => part.exercises).reduce((a,b)=> a+b,0)} exercises</h3>
     </div>
 
