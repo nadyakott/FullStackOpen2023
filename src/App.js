@@ -1,12 +1,14 @@
 import {useState, useEffect} from 'react'
+
+import phonebookService from "./services/phonebookService";
+
 import Filter from "./components/Fitler";
 import Persons from "./components/Persons";
 import PersonForm from "./components/PersonForm";
-import axios from "axios";
-
 
 const App = () => {
     const [persons, setPersons] = useState([])
+    const [newPerson, setPerson] = useState('')
     // const [persons, setPersons] = useState([
     //     {name: 'Arto Hellas', number: '040-123456', id: 1},
     //     {name: 'Ada Lovelace', number: '39-44-5323523', id: 2},
@@ -29,40 +31,62 @@ const App = () => {
         const contactObject = {
             name: newName,
             number: newNumber,
-            id: persons.length + 1
-
+            // id: persons.length + 1
         }
 
         const alertString = `${newName} ${newNumber} is already added to phonebook`
-        const filteredContacts = persons.filter(person => person.name === newName && person.number === newNumber)
+        const filteredContacts = persons.filter(person => person.name === newName)
+
+        const updatePerson = person => {
+            const ok = window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)
+            if (ok) {
+                phonebookService
+                    .update(person.id, {...person, number: newNumber})
+                    .then((updatedPerson) => {
+                        setPersons(persons.map(p => p.id === person.id ? updatedPerson : p))
+                    })
+            }
+
+        }
 
         if (filteredContacts.length > 0) {
-            alert(alertString)
+            console.log(newNumber, contactObject.number)
+            const person = filteredContacts.find(p => p.name === newName)
+
+            if (person) {
+                updatePerson(person)
+            }
         } else {
-            setPersons(persons.concat(contactObject))
+
+            phonebookService.create(contactObject)
+                .then(result => setPersons(persons.concat(result)))
         }
         clearAll()
     }
 
-    const fetchPhonebook = () => {
-        console.log('effect')
-        axios
-            .get('http://localhost:3001/persons')
-            .then(response => {
-                console.log('promise fulfilled')
-                setPersons(response.data)
+    const deleteContact = (person) => {
+        const ok = window.confirm(`Delete ${person.name}?`)
+        if (ok) {
+            phonebookService.remove(person.id).then(() => {
+                setPersons(persons.filter(p => p.id !== person.id))
             })
+        }
     }
-    useEffect(fetchPhonebook, [])
+
+    useEffect(() => {
+        phonebookService.getAll().then(result => setPersons(result))
+    }, [])
+
 
     return (
         <div>
             <h2>Phonebook</h2>
             <Filter filter={filter} setFilter={setFilter}/>
+            <h2>Add a new</h2>
             <PersonForm addContact={addContact} newName={newName}
                         newNumber={newNumber} setNewName={setNewName} setNewNumber={setNewNumber}/>
             <h2>Numbers</h2>
-            <Persons filter={filter} persons={persons}/>
+            <Persons filter={filter} persons={persons} deleteContact={deleteContact}/>
         </div>
     )
 }
