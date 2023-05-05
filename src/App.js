@@ -2,7 +2,7 @@ import {useState, useEffect} from 'react'
 
 import phonebookService from "./services/phonebookService";
 
-import Filter from "./components/Fitler";
+import Filter from "./components/Filter";
 import Persons from "./components/Persons";
 import PersonForm from "./components/PersonForm";
 
