@@ -60,6 +60,7 @@ const App = () => {
 
             phonebookService.create(contactObject)
                 .then(result => setPersons(persons.concat(result)))
+                .catch(err => err.response.data.error)
         }
         clearAll()
     }
